@@ -42,14 +42,14 @@ while t == 1 || not(isempty(Y))
 
     for i = 1:N
         % classify x
-        if d(nlab(i)) * dot(W(t, :), X(i,:)) >= 0
+        if d(nlab(i)) * dot(W, X(i,:)) >= 0
             % if missclassified, append to Y
             Y = [Y ; d(nlab(i)) * X(i,:)];
         end
     end
     
     % Error correction
-    W(t + 1, :) = W(t, :) - p * sum(Y);
+    W = W - p * sum(Y);
     
     t = t + 1;
 end
@@ -57,8 +57,22 @@ end
 %
 % plot discriminant 
 %
-scatter(X(:,1), X(:,2), '+');
+gscatter(X(:,1), X(:,2), nlab ,'rgb', 'osd');
 hold on;
 x = linspace(min(X(:,1)), max(X(:, 1)));
-y = -(W(t, 1)/W(t, 2)) * x - (W(t, 3)/W(t, 2));
-plot(X(:, 1), X(:,2), 'b.', x, y);
+y = -(W(1)/W(2)) * x - (W(3)/W(2));
+line(x, y, 'Color', 'cyan')
+
+%
+% Least Squares
+%
+
+LSW = (inv(X' * X)) * X' * ((nlab == 1) - (nlab == 2));
+y = -(LSW(1)/LSW(2)) * x - (LSW(3)/LSW(2));
+line(x, y, 'Color', 'blue');
+
+%
+% Fischers Discriminiant 
+%
+FISHW = fisherc(a);
+plotc(FISHW);
